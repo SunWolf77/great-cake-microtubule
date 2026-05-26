@@ -78,11 +78,11 @@ let params = {
   spectralStrength: 1.2,
   kuramotoSync: false,
   kuramotoStrength: 1.5,
-  hopfFibration: false,           // final boss 1
-  psiPulse: false,                // final boss 2
-  loveWave: false,                // final boss 3
-  quantumPhonon: false,           // final boss 4
-  hyperuniform: false,            // final boss 5
+  hopfFibration: false,
+  psiPulse: false,
+  loveWave: false,
+  quantumPhonon: false,
+  hyperuniform: false,
   hue: 238,
   glow: 0.1,
   wireframe: true
@@ -90,6 +90,8 @@ let params = {
 
 const PHI = (1 + Math.sqrt(5)) / 2;
 const GOLDEN_ANGLE = 360 * (1 - 1/PHI);
+
+let lastParamChange = 0;
 
 async function init() {
   scene = new THREE.Scene();
@@ -208,31 +210,26 @@ function computeField(x, y, z, t) {
     u += kuramoto * Math.exp(-r*r * 0.6);
   }
 
-  // Final Boss 1: Hopf Fibration / Double-Toroid
   if (params.hopfFibration) {
     const hopf = Math.sin(4*theta + 2*Math.PI*t) * Math.cos(z*0.3);
     u += 12.0 * hopf;
   }
 
-  // Final Boss 2: Psi / Conscious Field Pulse
   if (params.psiPulse) {
     const psi = 0.8 * Math.sin(2*Math.PI*0.1*t) + 0.3*Math.random();
     u *= (1 + psi);
   }
 
-  // Final Boss 3: Love Wave / Magneto-Dielectric Implosion
   if (params.loveWave) {
     const love = 15.0 * Math.tanh(6*(1 - r)) * Math.sin(2*Math.PI*0.618*t);
     u += love;
   }
 
-  // Final Boss 4: Quantum Phonon Resonance
   if (params.quantumPhonon) {
     const phonon = 8.0 * Math.sin(2*Math.PI*44*t + theta*12) * Math.exp(-r*r*2);
     u += phonon;
   }
 
-  // Final Boss 5: Hyperuniform Disordered Networks
   if (params.hyperuniform) {
     const hyper = 6.0 * Math.sin(18*theta + z*12) * Math.exp(-r*r*0.8);
     u += hyper;
@@ -254,7 +251,7 @@ function updateSurface() {
     const x = vertices[i];
     const y = vertices[i+1];
     const z = vertices[i+2];
-    let displacement = computeField(x, y, z, t) * params.heightScale * 0.75;
+    let displacement = computeField(x, y, z, t) * params.heightScale * 0.8; // slightly stronger response
     vertices[i+2] = z + displacement + 1.8 * Math.sin(2*Math.PI*0.4*z + 6*Math.PI*t);
   }
   mesh.geometry.attributes.position.needsUpdate = true;
@@ -318,6 +315,7 @@ function buildControls() {
       container.appendChild(div);
       document.getElementById(s.key + 'Toggle').addEventListener('change', (e) => {
         params[s.key] = e.target.checked ? 1 : 0;
+        lastParamChange = Date.now();
       });
     } else {
       div.innerHTML = `<label>${s.label}: <span id="${s.key}Val">${s.value}</span></label>
@@ -327,6 +325,7 @@ function buildControls() {
       document.getElementById(s.key + 'Slider').addEventListener('input', (e) => {
         params[s.key] = parseFloat(e.target.value);
         document.getElementById(s.key + 'Val').textContent = params[s.key].toFixed(2);
+        lastParamChange = Date.now();
       });
     }
   });
@@ -334,17 +333,45 @@ function buildControls() {
   const breathDiv = document.createElement('div');
   breathDiv.innerHTML = `<label><input type="checkbox" id="breathingToggle" checked> Coherent Modulation Mode</label>`;
   container.appendChild(breathDiv);
-  document.getElementById('breathingToggle').addEventListener('change', (e) => { params.breathing = e.target.checked; });
+  document.getElementById('breathingToggle').addEventListener('change', (e) => { 
+    params.breathing = e.target.checked; 
+    lastParamChange = Date.now();
+  });
 
   const wireDiv = document.createElement('div');
   wireDiv.innerHTML = `<label><input type="checkbox" id="wireToggle" checked> Wireframe Overlay</label>`;
   container.appendChild(wireDiv);
-  document.getElementById('wireToggle').addEventListener('change', (e) => { wireMesh.visible = e.target.checked; });
+  document.getElementById('wireToggle').addEventListener('change', (e) => { 
+    wireMesh.visible = e.target.checked; 
+  });
 
   const resetBtn = document.createElement('button');
   resetBtn.textContent = 'Reset All';
   resetBtn.onclick = () => location.reload();
   container.appendChild(resetBtn);
+}
+
+function updateSurface() {
+  const t = Date.now() * 0.001;
+  const vertices = mesh.geometry.attributes.position.array;
+
+  for (let i = 0; i < vertices.length; i += 3) {
+    const x = vertices[i];
+    const y = vertices[i+1];
+    const z = vertices[i+2];
+    let displacement = computeField(x, y, z, t) * params.heightScale * 0.85; // stronger response
+    vertices[i+2] = z + displacement + 1.8 * Math.sin(2*Math.PI*0.4*z + 6*Math.PI*t);
+  }
+  mesh.geometry.attributes.position.needsUpdate = true;
+  mesh.geometry.computeVertexNormals();
+  wireMesh.geometry.attributes.position.copy(mesh.geometry.attributes.position);
+  wireMesh.geometry.attributes.position.needsUpdate = true;
+
+  const colorShift = params.anesthesiaEffect * 0.6;
+  const color = new THREE.Color().setHSL((params.hue + colorShift*40) / 360, 1 - colorShift*0.5, 0.7);
+  mesh.material.color = color;
+  mesh.material.emissive = color;
+  mesh.material.emissiveIntensity = params.glow * (1 - params.anesthesiaEffect*0.4);
 }
 
 function animate() {
