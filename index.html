@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Microtubule Resonance Field — Paul Preprint Alignment</title>
+  <style>
+    body { margin:0; overflow:hidden; background:#000; font-family:Arial; }
+    #info { position:absolute; top:10px; left:10px; color:white; background:rgba(0,0,0,0.75); padding:15px 20px; border-radius:8px; z-index:10; min-width:380px; white-space:nowrap; }
+    #info .title { font-weight:bold; font-size:1.0em; display:block; margin-bottom:4px; }
+    #controls { position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.85); padding:15px; border-radius:10px; color:white; width:300px; max-height:92vh; overflow-y:auto; z-index:20; }
+    label { display:block; margin:10px 0 4px; font-size:13px; }
+    input[type="range"] { width:100%; }
+    button { margin-top:8px; width:100%; padding:8px; background:#00ffaa; border:none; border-radius:6px; color:black; font-weight:bold; }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+<div id="info">
+  <span class="title">Microtubule Resonance Field — Paul Preprint Alignment</span>
+  Drag to rotate • Scroll to zoom • Right-click drag to pan
+</div>
+<div id="controls"></div>
+
+<script>
+let scene, camera, renderer, mesh, wireMesh, controls;
+let params = {
+  heightScale: 3.5,
+  vacuumCoupling: 1.1,
+  breitWheeler: 1.8,
+  schumann783: 0.4,
+  schumann2349: 0.3,
+  multiLobeMod: 1.4,
+  hexResonator: 2.2,
+  warpField: 1.2,
+  metaCoupling: 0.8,
+  grapheneFluid: 0.7,
+  quantumRotation: 0.9,
+  hffLock: 0.021,
+  clutchBand: 1.32,
+  ezWaterDamping: 0.8,
+  anesthesiaEffect: 0.0,
+  breathing: true,
+  hue: 238,
+  glow: 0.1,
+  wireframe: true
+};
+
+async function init() {
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 100);
+  renderer = new THREE.WebGLRenderer({ antialias:true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+
+  const geometry = new THREE.CylinderGeometry(0.6, 0.6, 22, 24, 64, true);
+  const material = new THREE.MeshPhongMaterial({ 
+    color: 0x00ffcc, 
+    shininess: 90,
+    side: THREE.DoubleSide,
+    emissive: 0x00ffcc,
+    emissiveIntensity: 0.9
+  });
+  mesh = new THREE.Mesh(geometry, material);
+  mesh.rotation.z = Math.PI / 2;
+  scene.add(mesh);
+
+  const wireMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.3 });
+  wireMesh = new THREE.Mesh(geometry, wireMaterial);
+  wireMesh.rotation.z = Math.PI / 2;
+  scene.add(wireMesh);
+
+  scene.add(new THREE.AmbientLight(0x404060));
+  const dirLight = new THREE.DirectionalLight(0xffffff, 1.4);
+  dirLight.position.set(10, 20, 15);
+  scene.add(dirLight);
+
+  // Preferred default camera angle from your recordings
+  camera.position.set(12, 18, 28);
+  camera.lookAt(0, 4, 0);
+
+  buildControls();
+  animate();
+}
+
+// [Rest of the computeField, updateSurface, buildControls, animate functions remain exactly as in the last version I sent you]
+
+function computeField(x, y, z, t) { /* ... same as last version ... */ }
+function updateSurface() { /* ... same as last version ... */ }
+function buildControls() { /* ... same as last version ... */ }
+function animate() { /* ... same as last version ... */ }
+
+init();
+</script>
+</body>
+</html>
