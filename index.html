@@ -91,7 +91,7 @@ let params = {
 const PHI = (1 + Math.sqrt(5)) / 2;
 const GOLDEN_ANGLE = 360 * (1 - 1/PHI);
 
-let lastParamChange = 0;
+let paramChangedTime = 0;
 
 async function init() {
   scene = new THREE.Scene();
@@ -245,13 +245,15 @@ function computeField(x, y, z, t) {
 
 function updateSurface() {
   const t = Date.now() * 0.001;
+  const boost = (Date.now() - paramChangedTime < 1200) ? 1.8 : 1.0;
+
   const vertices = mesh.geometry.attributes.position.array;
 
   for (let i = 0; i < vertices.length; i += 3) {
     const x = vertices[i];
     const y = vertices[i+1];
     const z = vertices[i+2];
-    let displacement = computeField(x, y, z, t) * params.heightScale * 0.8; // slightly stronger response
+    let displacement = computeField(x, y, z, t) * params.heightScale * 0.9 * boost;
     vertices[i+2] = z + displacement + 1.8 * Math.sin(2*Math.PI*0.4*z + 6*Math.PI*t);
   }
   mesh.geometry.attributes.position.needsUpdate = true;
@@ -315,7 +317,7 @@ function buildControls() {
       container.appendChild(div);
       document.getElementById(s.key + 'Toggle').addEventListener('change', (e) => {
         params[s.key] = e.target.checked ? 1 : 0;
-        lastParamChange = Date.now();
+        paramChangedTime = Date.now();
       });
     } else {
       div.innerHTML = `<label>${s.label}: <span id="${s.key}Val">${s.value}</span></label>
@@ -325,7 +327,7 @@ function buildControls() {
       document.getElementById(s.key + 'Slider').addEventListener('input', (e) => {
         params[s.key] = parseFloat(e.target.value);
         document.getElementById(s.key + 'Val').textContent = params[s.key].toFixed(2);
-        lastParamChange = Date.now();
+        paramChangedTime = Date.now();
       });
     }
   });
@@ -335,7 +337,7 @@ function buildControls() {
   container.appendChild(breathDiv);
   document.getElementById('breathingToggle').addEventListener('change', (e) => { 
     params.breathing = e.target.checked; 
-    lastParamChange = Date.now();
+    paramChangedTime = Date.now();
   });
 
   const wireDiv = document.createElement('div');
@@ -353,13 +355,15 @@ function buildControls() {
 
 function updateSurface() {
   const t = Date.now() * 0.001;
+  const boost = (Date.now() - paramChangedTime < 1200) ? 1.8 : 1.0;
+
   const vertices = mesh.geometry.attributes.position.array;
 
   for (let i = 0; i < vertices.length; i += 3) {
     const x = vertices[i];
     const y = vertices[i+1];
     const z = vertices[i+2];
-    let displacement = computeField(x, y, z, t) * params.heightScale * 0.85; // stronger response
+    let displacement = computeField(x, y, z, t) * params.heightScale * 0.9 * boost;
     vertices[i+2] = z + displacement + 1.8 * Math.sin(2*Math.PI*0.4*z + 6*Math.PI*t);
   }
   mesh.geometry.attributes.position.needsUpdate = true;
