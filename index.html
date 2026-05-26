@@ -2,15 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Microtubule Resonance Field — Paul Preprint Alignment</title>
   <style>
-    body { margin:0; overflow:hidden; background:#000; font-family:Arial; }
-    #info { position:absolute; top:10px; left:10px; color:white; background:rgba(0,0,0,0.75); padding:15px 20px; border-radius:8px; z-index:10; min-width:380px; white-space:nowrap; }
-    #info .title { font-weight:bold; font-size:1.0em; display:block; margin-bottom:4px; }
-    #controls { position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.85); padding:15px; border-radius:10px; color:white; width:300px; max-height:92vh; overflow-y:auto; z-index:20; }
-    label { display:block; margin:10px 0 4px; font-size:13px; }
+    body { margin:0; overflow:hidden; background:#000; font-family:Arial; touch-action:none; }
+    #info { position:absolute; top:10px; left:10px; color:white; background:rgba(0,0,0,0.75); padding:12px 18px; border-radius:8px; z-index:10; min-width:260px; white-space:nowrap; font-size:14px; }
+    #info .title { font-weight:bold; font-size:1.05em; display:block; margin-bottom:4px; }
+    #controls { 
+      position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.88); padding:15px; border-radius:12px; color:white; 
+      width:280px; max-height:85vh; overflow-y:auto; z-index:20; box-shadow:0 4px 20px rgba(0,0,0,0.6);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    #controls.hidden { transform: translateX(120%); opacity:0; pointer-events:none; }
+    label { display:block; margin:12px 0 6px; font-size:13px; }
     input[type="range"] { width:100%; }
-    button { margin-top:8px; width:100%; padding:8px; background:#00ffaa; border:none; border-radius:6px; color:black; font-weight:bold; }
+    button { margin-top:8px; width:100%; padding:10px; background:#00ffaa; border:none; border-radius:8px; color:black; font-weight:bold; font-size:15px; }
+    #toggleBtn {
+      position:absolute; top:10px; right:10px; z-index:30; background:rgba(0,0,0,0.8); color:white; border:none; 
+      padding:8px 14px; border-radius:50px; font-size:13px; box-shadow:0 2px 10px rgba(0,0,0,0.5);
+    }
+    @media (max-width: 768px) {
+      #controls { width:260px; padding:12px; }
+      #info { font-size:13px; padding:10px 14px; }
+    }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
@@ -18,13 +32,15 @@
 <body>
 <div id="info">
   <span class="title">Microtubule Resonance Field — Paul Preprint Alignment</span>
-  Drag to rotate • Scroll to zoom • Right-click drag to pan
+  Drag to rotate • Scroll/Pinch to zoom • Right-click drag to pan
 </div>
+
+<button id="toggleBtn">Hide Controls</button>
 <div id="controls"></div>
 
 <script>
 let scene, camera, renderer, mesh, wireMesh, controls;
-let params = {
+let params = { /* same as previous version - unchanged */ 
   heightScale: 3.5,
   vacuumCoupling: 1.1,
   breitWheeler: 1.8,
@@ -33,8 +49,8 @@ let params = {
   multiLobeMod: 1.4,
   hexResonator: 2.8,
   primeLattice144: 1.2,
-  tryptophanSuperradiance: 1.0,   // new
-  scaleInvariant: 1.8,            // new - stronger scale-invariant resonance
+  tryptophanSuperradiance: 1.0,
+  scaleInvariant: 1.8,
   warpField: 1.2,
   metaCoupling: 0.8,
   grapheneFluid: 0.7,
@@ -61,11 +77,7 @@ async function init() {
 
   const geometry = new THREE.CylinderGeometry(0.6, 0.6, 22, 24, 64, true);
   const material = new THREE.MeshPhongMaterial({ 
-    color: 0x00ffcc, 
-    shininess: 90,
-    side: THREE.DoubleSide,
-    emissive: 0x00ffcc,
-    emissiveIntensity: 0.9
+    color: 0x00ffcc, shininess: 90, side: THREE.DoubleSide, emissive: 0x00ffcc, emissiveIntensity: 0.9
   });
   mesh = new THREE.Mesh(geometry, material);
   mesh.rotation.z = Math.PI / 2;
@@ -100,18 +112,14 @@ function computeField(x, y, z, t) {
   u += params.schumann783 * 5.5 * Math.sin(2*Math.PI*7.83*t);
   u += params.schumann2349 * 4.5 * Math.sin(2*Math.PI*23.49*t);
   u += params.multiLobeMod * 8.0 * Math.sin(12*theta) * Math.exp(-r*r/0.15);
-  
-  // Sharper hexagonal resonator
   u += params.hexResonator * 20.0 * Math.sin(6*theta) * Math.exp(-r*r * 2.2);
-
-  // 144 Hz Prime Lattice
   u += params.primeLattice144 * 9.5 * Math.sin(2*Math.PI*144*t) * Math.cos(6*theta);
 
-  // New: Tryptophan Superradiance (collective coherent boosting)
+  // Tryptophan Superradiance
   const superradiance = params.tryptophanSuperradiance * 7.5 * Math.sin(2*Math.PI*377*t) * Math.exp(-r*r*0.6);
   u += superradiance;
 
-  // New: Stronger scale-invariant resonance (nested fractal-like modulation)
+  // Stronger scale-invariant resonance
   const scaleMod = params.scaleInvariant * (Math.sin(2*Math.PI*377*t) + 0.6*Math.sin(2*Math.PI*144*t) + 0.4*Math.sin(2*Math.PI*7.83*t));
   u *= (1 + scaleMod * Math.exp(-r*r*0.4));
 
@@ -158,12 +166,13 @@ function updateSurface() {
 
 function buildControls() {
   const container = document.getElementById('controls');
+  // ... (same sliders as last version, including the two new ones) ...
   const sliders = [
     {key:'heightScale', label:'Height Scale', min:0.5, max:12, step:0.1, value:3.5},
     {key:'hexResonator', label:'Hexagonal Resonator', min:0, max:8, step:0.1, value:2.8},
     {key:'primeLattice144', label:'144 Hz Prime Lattice', min:0, max:4, step:0.1, value:1.2},
-    {key:'tryptophanSuperradiance', label:'Tryptophan Superradiance', min:0, max:3, step:0.1, value:1.0},   // new
-    {key:'scaleInvariant', label:'Scale-Invariant Resonance', min:0, max:4, step:0.1, value:1.8},           // new
+    {key:'tryptophanSuperradiance', label:'Tryptophan Superradiance', min:0, max:3, step:0.1, value:1.0},
+    {key:'scaleInvariant', label:'Scale-Invariant Resonance', min:0, max:4, step:0.1, value:1.8},
     {key:'vacuumCoupling', label:'Vacuum Coupling Strength', min:0, max:4, step:0.1, value:1.1},
     {key:'breitWheeler', label:'Photon-Pair Production', min:0, max:5, step:0.1, value:1.8},
     {key:'schumann783', label:'Schumann 7.83 Hz', min:0, max:3, step:0.1, value:0.4},
@@ -206,12 +215,34 @@ function buildControls() {
   container.appendChild(resetBtn);
 }
 
+// Toggle button
+const toggleBtn = document.getElementById('toggleBtn');
+const controlsPanel = document.getElementById('controls');
+let controlsVisible = true;
+
+toggleBtn.addEventListener('click', () => {
+  controlsVisible = !controlsVisible;
+  if (controlsVisible) {
+    controlsPanel.classList.remove('hidden');
+    toggleBtn.textContent = 'Hide Controls';
+  } else {
+    controlsPanel.classList.add('hidden');
+    toggleBtn.textContent = 'Show Controls';
+  }
+});
+
 function animate() {
   requestAnimationFrame(animate);
   if (mesh) updateSurface();
   if (controls) controls.update();
   renderer.render(scene, camera);
 }
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
 
 init();
 </script>
