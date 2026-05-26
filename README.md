@@ -1,24 +1,57 @@
-# SUPT Microtubule Resonance Field
+# SUPT Great Cake — Microtubule Resonance Field Simulator
 
-Real-time 3D visualization of microtubule geometric resonance aligned with Paul Sheppard's April 2026 preprint.
-Published at this link: https://zenodo.org/records/19497513
+**Interactive 3D visualisation of microtubule resonance aligned with Paul Sheppard's SUPT preprint.**
+->https://doi.org/10.5281/zenodo.19497513 @PaulSheppard_CO
 
-### Evolution
-- **Original Great Cake** (posted 25 May): Mathematical resonance field inspired by cymatics, hexagonal resonators, warp fields, and neutral-atom trapping.
-- **Current version**: Fully aligned with Paul's measured geometric coupling hierarchy (HFF aromatic lock d_ij=0.021, GTP/GDP clutch band, EZ water selection energy, anesthesia prediction).
+A real-time exploration tool for toroidal, golden-ratio, and phase-locked resonance phenomena. Built as part of the ongoing "CHAOTICAKE" research journey with Grok.
 
-### What you're seeing
-- Live resonant microtubule lattice
-- HFF lock, clutch band engagement, EZ water damping
-- Real-time decoherence under anesthesia effect
-- Phase steering, hexagonal boundary resonance, 377 Hz carrier + Schumann harmonics
+### Live Demo
+[https://sunwolf77.github.io/great-cake-microtubule/](https://sunwolf77.github.io/great-cake-microtubule/)
 
-### How to run
-Just open `index.html` in any modern browser (no install required).
+### Features (The Full CHAOTICAKE)
 
-### Parameters
-All major sliders are now tuned for clarity and directly reference Paul's structural data.
+**Core Resonance Systems**
+- Hexagonal Resonator + 13-protofilament cylinder
+- Prime Lattice (144 Hz)
+- Tryptophan Superradiance
+- Scale-Invariant Resonance
+- Schumann Harmonics (7.83 Hz & 23.49 Hz)
+
+**Advanced Modes (Final Boss Layer)**
+- Vortex / Mercury Mode
+- Triple Stack / Tree Ring Mode
+- Flower of Centripetal Implosion
+- Fibonacci Phyllotaxis
+- Golden Angle Geometry
+- Vogel’s Model (classic sunflower algorithm)
+- Spectral Master Field
+- Kuramoto Synchronization
+- Hopf Fibration / Double-Toroid Emergence
+- Psi / Conscious Field Pulse
+- Love Wave / Magneto-Dielectric Implosion
+- Quantum Phonon Resonance
+- Hyperuniform Disordered Networks
+
+### Controls
+All parameters are adjustable in real time via the right-side panel. Toggle any combination of modes to explore layered coherent fields.
+
+**Suggested combinations to try:**
+- Vortex + Triple Stack + Flower Implosion
+- Golden Angle + Vogel + Phyllotaxis
+- Spectral Master Field + Kuramoto + Psi Pulse (maximum coherence)
+- Hopf Fibration + Love Wave (higher-dimensional feel)
+
+### Purpose
+This simulator serves as a visual research and intuition-building tool for SUPT, cymatics, toroidal resonance, and the geometry of coherent "living" fields. It bridges Paul Sheppard's physical mercury experiments with theoretical models (golden ratio, Vogel phyllotaxis, Kuramoto synchronization, spectral fields, etc.).
+
+### Tech
+- Three.js r134
+- Real-time CPU vertex displacement
+- OrbitControls with damping
+- Fully self-contained single HTML file
 
 ---
 
-Built by Ben Rowe https://x.com/Sunwolf77 with Grok Heavy + SUPT framework https://x.com/PaulSheppard_CO.
+Built live with Grok. Still evolving. Feedback always welcome.
+
+— SunWolf https://x.com/Sunwolf77
