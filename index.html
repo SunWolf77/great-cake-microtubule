@@ -16,29 +16,17 @@
     #controls { 
       position:absolute; top:10px; right:8px; background:rgba(0,0,0,0.88); padding:10px; border-radius:12px; color:white; 
       width:220px; max-height:75vh; overflow-y:auto; z-index:20; box-shadow:0 4px 20px rgba(0,0,0,0.6);
-      transition: transform 0.3s ease, opacity 0.3s ease;
     }
-    #controls.hidden { transform: translateX(120%); opacity:0; pointer-events:none; }
     
     label { display:block; margin:8px 0 4px; font-size:12px; line-height:1.2; }
     input[type="range"] { width:100%; }
     
     button { margin-top:8px; width:100%; padding:8px; background:#00ffaa; border:none; border-radius:8px; color:black; font-weight:bold; font-size:13px; }
     
-    #hideBtn { background:#ff4444; color:white; margin-bottom:12px; }
-    
-    #showBtn {
-      position:absolute; top:12px; right:12px; z-index:30; 
-      background:rgba(0,0,0,0.85); color:white; border:none; 
-      padding:5px 12px; border-radius:30px; font-size:12px; 
-      box-shadow:0 2px 10px rgba(0,0,0,0.4);
-    }
-    
     @media (max-width: 768px) {
-      #controls { width:205px; padding:8px; right:6px; max-height:72vh; }
+      #controls { width:205px; padding:8px; right:6px; max-height:70vh; }
       label { font-size:11.5px; margin:7px 0 3px; }
       #info { min-width:210px; font-size:12.5px; padding:8px 12px; }
-      #showBtn { top:12px; right:8px; font-size:11.5px; padding:4px 10px; }
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
@@ -50,7 +38,6 @@
   Drag to rotate • Pinch/scroll to zoom
 </div>
 
-<button id="showBtn">Controls</button>
 <div id="controls"></div>
 
 <script>
@@ -185,11 +172,6 @@ function updateSurface() {
 
 function buildControls() {
   const container = document.getElementById('controls');
-  
-  const hideBtn = document.createElement('button');
-  hideBtn.id = 'hideBtn';
-  hideBtn.textContent = 'Hide Controls';
-  container.appendChild(hideBtn);
 
   const sliders = [
     {key:'heightScale', label:'Height Scale', min:0.5, max:12, step:0.1, value:3.5},
@@ -245,18 +227,6 @@ function animate() {
   if (controls) controls.update();
   renderer.render(scene, camera);
 }
-
-const showBtn = document.getElementById('showBtn');
-const controlsPanel = document.getElementById('controls');
-const hideBtn = document.getElementById('hideBtn');
-
-hideBtn.addEventListener('click', () => {
-  controlsPanel.classList.add('hidden');
-});
-
-showBtn.addEventListener('click', () => {
-  controlsPanel.classList.remove('hidden');
-});
 
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
