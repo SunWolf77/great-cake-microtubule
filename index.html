@@ -33,6 +33,8 @@ let params = {
   multiLobeMod: 1.4,
   hexResonator: 2.8,
   primeLattice144: 1.2,
+  tryptophanSuperradiance: 1.0,   // new
+  scaleInvariant: 1.8,            // new - stronger scale-invariant resonance
   warpField: 1.2,
   metaCoupling: 0.8,
   grapheneFluid: 0.7,
@@ -99,11 +101,19 @@ function computeField(x, y, z, t) {
   u += params.schumann2349 * 4.5 * Math.sin(2*Math.PI*23.49*t);
   u += params.multiLobeMod * 8.0 * Math.sin(12*theta) * Math.exp(-r*r/0.15);
   
-  // Sharper hexagonal resonator — now at 20.0
+  // Sharper hexagonal resonator
   u += params.hexResonator * 20.0 * Math.sin(6*theta) * Math.exp(-r*r * 2.2);
 
-  // 144 Hz Prime Lattice layer
+  // 144 Hz Prime Lattice
   u += params.primeLattice144 * 9.5 * Math.sin(2*Math.PI*144*t) * Math.cos(6*theta);
+
+  // New: Tryptophan Superradiance (collective coherent boosting)
+  const superradiance = params.tryptophanSuperradiance * 7.5 * Math.sin(2*Math.PI*377*t) * Math.exp(-r*r*0.6);
+  u += superradiance;
+
+  // New: Stronger scale-invariant resonance (nested fractal-like modulation)
+  const scaleMod = params.scaleInvariant * (Math.sin(2*Math.PI*377*t) + 0.6*Math.sin(2*Math.PI*144*t) + 0.4*Math.sin(2*Math.PI*7.83*t));
+  u *= (1 + scaleMod * Math.exp(-r*r*0.4));
 
   u += params.warpField * 7.0 * Math.tanh(8*(x*Math.cos(2*Math.PI*t) + y*Math.sin(2*Math.PI*t)));
   u += params.metaCoupling * 5.5 * Math.sin(12*theta) * Math.cos(2*Math.PI*377*t);
@@ -152,6 +162,8 @@ function buildControls() {
     {key:'heightScale', label:'Height Scale', min:0.5, max:12, step:0.1, value:3.5},
     {key:'hexResonator', label:'Hexagonal Resonator', min:0, max:8, step:0.1, value:2.8},
     {key:'primeLattice144', label:'144 Hz Prime Lattice', min:0, max:4, step:0.1, value:1.2},
+    {key:'tryptophanSuperradiance', label:'Tryptophan Superradiance', min:0, max:3, step:0.1, value:1.0},   // new
+    {key:'scaleInvariant', label:'Scale-Invariant Resonance', min:0, max:4, step:0.1, value:1.8},           // new
     {key:'vacuumCoupling', label:'Vacuum Coupling Strength', min:0, max:4, step:0.1, value:1.1},
     {key:'breitWheeler', label:'Photon-Pair Production', min:0, max:5, step:0.1, value:1.8},
     {key:'schumann783', label:'Schumann 7.83 Hz', min:0, max:3, step:0.1, value:0.4},
