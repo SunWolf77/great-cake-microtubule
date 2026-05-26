@@ -31,7 +31,8 @@ let params = {
   schumann783: 0.4,
   schumann2349: 0.3,
   multiLobeMod: 1.4,
-  hexResonator: 2.2,
+  hexResonator: 2.8,           // increased base value
+  primeLattice144: 1.2,        // new 144 Hz layer
   warpField: 1.2,
   metaCoupling: 0.8,
   grapheneFluid: 0.7,
@@ -78,7 +79,6 @@ async function init() {
   dirLight.position.set(10, 20, 15);
   scene.add(dirLight);
 
-  // New default camera angle (matches your recordings)
   camera.position.set(12, 18, 28);
   camera.lookAt(0, 4, 0);
 
@@ -98,7 +98,13 @@ function computeField(x, y, z, t) {
   u += params.schumann783 * 5.5 * Math.sin(2*Math.PI*7.83*t);
   u += params.schumann2349 * 4.5 * Math.sin(2*Math.PI*23.49*t);
   u += params.multiLobeMod * 8.0 * Math.sin(12*theta) * Math.exp(-r*r/0.15);
-  u += params.hexResonator * 9.0 * Math.sin(6*theta);
+  
+  // Sharper hexagonal resonator
+  u += params.hexResonator * 14.0 * Math.sin(6*theta) * Math.exp(-r*r * 1.8);
+  
+  // New 144 Hz Prime Lattice layer
+  u += params.primeLattice144 * 9.5 * Math.sin(2*Math.PI*144*t) * Math.cos(6*theta);
+
   u += params.warpField * 7.0 * Math.tanh(8*(x*Math.cos(2*Math.PI*t) + y*Math.sin(2*Math.PI*t)));
   u += params.metaCoupling * 5.5 * Math.sin(12*theta) * Math.cos(2*Math.PI*377*t);
   u += params.grapheneFluid * 5.0 * Math.sin(2*Math.PI*4*t);
@@ -113,7 +119,6 @@ function computeField(x, y, z, t) {
 
   const decoherence = params.anesthesiaEffect * 0.9;
   u *= (1 - decoherence);
-  const effectiveClutch = params.clutchBand * (1 + decoherence * 0.5);
 
   return u;
 }
@@ -145,17 +150,15 @@ function buildControls() {
   const container = document.getElementById('controls');
   const sliders = [
     {key:'heightScale', label:'Height Scale', min:0.5, max:12, step:0.1, value:3.5},
+    {key:'hexResonator', label:'Hexagonal Resonator (sharper nodes)', min:0, max:8, step:0.1, value:2.8},
+    {key:'primeLattice144', label:'144 Hz Prime Lattice', min:0, max:4, step:0.1, value:1.2},
     {key:'vacuumCoupling', label:'Vacuum Coupling Strength', min:0, max:4, step:0.1, value:1.1},
     {key:'breitWheeler', label:'Photon-Pair Production', min:0, max:5, step:0.1, value:1.8},
-    {key:'schumann783', label:'Schumann Resonance 7.83 Hz', min:0, max:3, step:0.1, value:0.4},
-    {key:'schumann2349', label:'Schumann Resonance 23.49 Hz', min:0, max:3, step:0.1, value:0.3},
+    {key:'schumann783', label:'Schumann 7.83 Hz', min:0, max:3, step:0.1, value:0.4},
+    {key:'schumann2349', label:'Schumann 23.49 Hz', min:0, max:3, step:0.1, value:0.3},
     {key:'multiLobeMod', label:'Multi-Lobe Modulation', min:0, max:4, step:0.1, value:1.4},
-    {key:'hexResonator', label:'Hexagonal Boundary Resonance', min:0, max:8, step:0.1, value:2.2},
     {key:'warpField', label:'Warp Field Gradient', min:0, max:4, step:0.1, value:1.2},
-    {key:'metaCoupling', label:'Metasurface Coupling', min:0, max:3, step:0.1, value:0.8},
-    {key:'grapheneFluid', label:'Graphene-Like Fluid Dynamics', min:0, max:3, step:0.1, value:0.7},
-    {key:'quantumRotation', label:'Quantum Rotation Coupling', min:0, max:3, step:0.1, value:0.9},
-    {key:'hffLock', label:'HFF Aromatic Lock (Paul)', min:0, max:2, step:0.01, value:0.021},
+    {key:'hffLock', label:'HFF Aromatic Lock', min:0, max:2, step:0.01, value:0.021},
     {key:'clutchBand', label:'Clutch Band (GTP→GDP)', min:1.0, max:2.0, step:0.01, value:1.32},
     {key:'ezWaterDamping', label:'EZ Water Damping', min:0, max:2, step:0.1, value:0.8},
     {key:'anesthesiaEffect', label:'Anesthesia Pocket Effect', min:0, max:1, step:0.05, value:0.0},
