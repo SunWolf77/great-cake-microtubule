@@ -15,17 +15,17 @@
     
     #controls { 
       position:absolute; top:10px; right:8px; background:rgba(0,0,0,0.88); padding:10px; border-radius:12px; color:white; 
-      width:220px; max-height:75vh; overflow-y:auto; z-index:20; box-shadow:0 4px 20px rgba(0,0,0,0.6);
+      width:205px; max-height:72vh; overflow-y:auto; z-index:20; box-shadow:0 4px 20px rgba(0,0,0,0.6);
     }
     
-    label { display:block; margin:8px 0 4px; font-size:12px; line-height:1.2; }
+    label { display:block; margin:8px 0 4px; font-size:11.5px; line-height:1.2; }
     input[type="range"] { width:100%; }
     
     button { margin-top:8px; width:100%; padding:8px; background:#00ffaa; border:none; border-radius:8px; color:black; font-weight:bold; font-size:13px; }
     
     @media (max-width: 768px) {
-      #controls { width:205px; padding:8px; right:6px; max-height:70vh; }
-      label { font-size:11.5px; margin:7px 0 3px; }
+      #controls { width:195px; padding:8px; right:6px; max-height:68vh; }
+      label { font-size:11px; margin:7px 0 3px; }
       #info { min-width:210px; font-size:12.5px; padding:8px 12px; }
     }
   </style>
@@ -68,42 +68,46 @@ let params = {
 };
 
 async function init() {
-  scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 100);
-  renderer = new THREE.WebGLRenderer({ antialias:true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
+  try {
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 100);
+    renderer = new THREE.WebGLRenderer({ antialias:true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
-  controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
 
-  const geometry = new THREE.CylinderGeometry(0.6, 0.6, 22, 24, 64, true);
-  const material = new THREE.MeshPhongMaterial({ 
-    color: 0x00ffcc, 
-    shininess: 90,
-    side: THREE.DoubleSide,
-    emissive: 0x00ffcc,
-    emissiveIntensity: 0.9
-  });
-  mesh = new THREE.Mesh(geometry, material);
-  mesh.rotation.z = Math.PI / 2;
-  scene.add(mesh);
+    const geometry = new THREE.CylinderGeometry(0.6, 0.6, 22, 24, 64, true);
+    const material = new THREE.MeshPhongMaterial({ 
+      color: 0x00ffcc, 
+      shininess: 90,
+      side: THREE.DoubleSide,
+      emissive: 0x00ffcc,
+      emissiveIntensity: 0.9
+    });
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.rotation.z = Math.PI / 2;
+    scene.add(mesh);
 
-  const wireMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.3 });
-  wireMesh = new THREE.Mesh(geometry, wireMaterial);
-  wireMesh.rotation.z = Math.PI / 2;
-  scene.add(wireMesh);
+    const wireMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.3 });
+    wireMesh = new THREE.Mesh(geometry, wireMaterial);
+    wireMesh.rotation.z = Math.PI / 2;
+    scene.add(wireMesh);
 
-  scene.add(new THREE.AmbientLight(0x404060));
-  const dirLight = new THREE.DirectionalLight(0xffffff, 1.4);
-  dirLight.position.set(10, 20, 15);
-  scene.add(dirLight);
+    scene.add(new THREE.AmbientLight(0x404060));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.4);
+    dirLight.position.set(10, 20, 15);
+    scene.add(dirLight);
 
-  camera.position.set(12, 18, 28);
-  camera.lookAt(0, 4, 0);
+    camera.position.set(12, 18, 28);
+    camera.lookAt(0, 4, 0);
 
-  buildControls();
-  animate();
+    buildControls();
+    animate();
+  } catch (e) {
+    console.error("Init error:", e);
+  }
 }
 
 function computeField(x, y, z, t) {
@@ -144,30 +148,34 @@ function computeField(x, y, z, t) {
   const decoherence = params.anesthesiaEffect * 0.9;
   u *= (1 - decoherence);
 
-  return u;
+  return Math.max(-8, Math.min(8, u)); // clamp to prevent gaps
 }
 
 function updateSurface() {
-  const t = Date.now() * 0.001;
-  const vertices = mesh.geometry.attributes.position.array;
+  try {
+    const t = Date.now() * 0.001;
+    const vertices = mesh.geometry.attributes.position.array;
 
-  for (let i = 0; i < vertices.length; i += 3) {
-    const x = vertices[i];
-    const y = vertices[i+1];
-    const z = vertices[i+2];
-    const displacement = computeField(x, y, z, t) * params.heightScale;
-    vertices[i+2] = z + displacement * 0.85 + 2.2 * Math.sin(2*Math.PI*0.4*z + 6*Math.PI*t);
+    for (let i = 0; i < vertices.length; i += 3) {
+      const x = vertices[i];
+      const y = vertices[i+1];
+      const z = vertices[i+2];
+      const displacement = computeField(x, y, z, t) * params.heightScale * 0.75; // reduced strength
+      vertices[i+2] = z + displacement * 0.85 + 1.8 * Math.sin(2*Math.PI*0.4*z + 6*Math.PI*t);
+    }
+    mesh.geometry.attributes.position.needsUpdate = true;
+    mesh.geometry.computeVertexNormals();
+    wireMesh.geometry.attributes.position.copy(mesh.geometry.attributes.position);
+    wireMesh.geometry.attributes.position.needsUpdate = true;
+
+    const colorShift = params.anesthesiaEffect * 0.6;
+    const color = new THREE.Color().setHSL((params.hue + colorShift*40) / 360, 1 - colorShift*0.5, 0.7);
+    mesh.material.color = color;
+    mesh.material.emissive = color;
+    mesh.material.emissiveIntensity = params.glow * (1 - params.anesthesiaEffect*0.4);
+  } catch (e) {
+    console.error("Update error:", e);
   }
-  mesh.geometry.attributes.position.needsUpdate = true;
-  mesh.geometry.computeVertexNormals();
-  wireMesh.geometry.attributes.position.copy(mesh.geometry.attributes.position);
-  wireMesh.geometry.attributes.position.needsUpdate = true;
-
-  const colorShift = params.anesthesiaEffect * 0.6;
-  const color = new THREE.Color().setHSL((params.hue + colorShift*40) / 360, 1 - colorShift*0.5, 0.7);
-  mesh.material.color = color;
-  mesh.material.emissive = color;
-  mesh.material.emissiveIntensity = params.glow * (1 - params.anesthesiaEffect*0.4);
 }
 
 function buildControls() {
