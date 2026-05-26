@@ -21,4 +21,4 @@ All major sliders are now tuned for clarity and directly reference Paul's struct
 
 ---
 
-Built with Grok Heavy + SUPT framework.
+Built by Ben Rowe https://x.com/Sunwolf77 with Grok Heavy + SUPT framework https://x.com/PaulSheppard_CO.
