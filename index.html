@@ -11,9 +11,7 @@
       padding:12px 16px; border-radius:8px; z-index:10; min-width:260px; max-width:90vw; 
       white-space:normal; font-size:13.5px; line-height:1.3;
     }
-    #info .title { 
-      font-weight:bold; font-size:1.05em; display:block; margin-bottom:4px; 
-    }
+    #info .title { font-weight:bold; font-size:1.05em; display:block; margin-bottom:4px; }
     
     #controls { 
       position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.88); padding:12px; border-radius:12px; color:white; 
@@ -27,18 +25,14 @@
     
     button { margin-top:8px; width:100%; padding:9px; background:#00ffaa; border:none; border-radius:8px; color:black; font-weight:bold; font-size:14px; }
     
-    #toggleBtn {
-      position:absolute; top:12px; left:280px; z-index:30; 
-      background:rgba(0,0,0,0.85); color:white; border:none; 
-      padding:5px 11px; border-radius:30px; font-size:12px; 
-      box-shadow:none;
+    #hideBtn {
+      width:100%; padding:8px; background:#ff4444; color:white; border:none; border-radius:8px; font-weight:bold; margin-bottom:12px;
     }
     
     @media (max-width: 768px) {
       #controls { width:240px; padding:10px; }
       label { font-size:12px; margin:9px 0 4px; }
       #info { min-width:220px; max-width:90vw; font-size:13px; padding:10px 14px; }
-      #toggleBtn { top:12px; left:235px; font-size:11.5px; padding:4px 10px; }
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
@@ -50,8 +44,10 @@
   Drag to rotate • Pinch/scroll to zoom
 </div>
 
-<button id="toggleBtn">Hide Controls</button>
-<div id="controls"></div>
+<div id="controls">
+  <button id="hideBtn">Hide Controls</button>
+  <!-- sliders go here -->
+</div>
 
 <script>
 let scene, camera, renderer, mesh, wireMesh, controls;
@@ -240,19 +236,11 @@ function animate() {
   renderer.render(scene, camera);
 }
 
-const toggleBtn = document.getElementById('toggleBtn');
+const hideBtn = document.getElementById('hideBtn');
 const controlsPanel = document.getElementById('controls');
-let controlsVisible = true;
 
-toggleBtn.addEventListener('click', () => {
-  controlsVisible = !controlsVisible;
-  if (controlsVisible) {
-    controlsPanel.classList.remove('hidden');
-    toggleBtn.textContent = 'Hide Controls';
-  } else {
-    controlsPanel.classList.add('hidden');
-    toggleBtn.textContent = 'Show Controls';
-  }
+hideBtn.addEventListener('click', () => {
+  controlsPanel.classList.add('hidden');
 });
 
 window.addEventListener('resize', () => {
