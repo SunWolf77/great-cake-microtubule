@@ -1,6 +1,7 @@
 # SUPT Microtubule Resonance Field
 
 Real-time 3D visualization of microtubule geometric resonance aligned with Paul Sheppard's April 2026 preprint.
+Published at this link: https://zenodo.org/records/19497513
 
 ### Evolution
 - **Original Great Cake** (posted 25 May): Mathematical resonance field inspired by cymatics, hexagonal resonators, warp fields, and neutral-atom trapping.
