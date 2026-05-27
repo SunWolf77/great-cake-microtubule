@@ -83,6 +83,8 @@ let params = {
   loveWave: false,
   quantumPhonon: false,
   hyperuniform: false,
+  biologicalCoherence: true,     // new - Being Alive core
+  emergentLife: true,            // new - Being Alive core
   hue: 238,
   glow: 0.1,
   wireframe: true
@@ -92,6 +94,7 @@ const PHI = (1 + Math.sqrt(5)) / 2;
 const GOLDEN_ANGLE = 360 * (1 - 1/PHI);
 
 let paramChangedTime = 0;
+let lifePhase = 0; // for emergent behaviour
 
 async function init() {
   scene = new THREE.Scene();
@@ -235,6 +238,19 @@ function computeField(x, y, z, t) {
     u += hyper;
   }
 
+  // New: Biological Coherence (Being Alive)
+  if (params.biologicalCoherence) {
+    const bioCoherence = params.tryptophanSuperradiance * 9.0 * Math.sin(2*Math.PI*377*t * 1.1) * Math.exp(-r*r * 0.4);
+    u += bioCoherence;
+  }
+
+  // New: Emergent Life Behaviour
+  if (params.emergentLife) {
+    lifePhase += 0.0008;
+    const emergent = 7.0 * Math.sin(lifePhase * 2 + z * 0.8) * Math.cos(theta * 3 + lifePhase);
+    u += emergent * Math.exp(-r*r * 0.5);
+  }
+
   u *= Math.exp(-r*r * params.ezWaterDamping);
 
   const decoherence = params.anesthesiaEffect * 0.9;
@@ -290,6 +306,8 @@ function buildControls() {
     {key:'loveWave', label:'Love Wave / Magneto-Dielectric Implosion', min:0, max:1, step:1, value:0},
     {key:'quantumPhonon', label:'Quantum Phonon Resonance', min:0, max:1, step:1, value:0},
     {key:'hyperuniform', label:'Hyperuniform Disordered Networks', min:0, max:1, step:1, value:0},
+    {key:'biologicalCoherence', label:'Biological Coherence', min:0, max:1, step:1, value:1}, // new
+    {key:'emergentLife', label:'Emergent Life Behaviour', min:0, max:1, step:1, value:1}, // new
     {key:'vogelScale', label:'Vogel Scale (c)', min:0.2, max:2, step:0.05, value:0.8},
     {key:'vogelImplosion', label:'Vogel Implosion', min:0.5, max:3, step:0.1, value:1.2},
     {key:'goldenAngleStrength', label:'Golden Angle Strength', min:0, max:5, step:0.1, value:2.8},
